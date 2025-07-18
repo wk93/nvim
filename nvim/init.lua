@@ -16,6 +16,8 @@ opt.tabstop = 2
 opt.softtabstop = 2
 opt.shiftwidth = 2
 
+vim.cmd.colorscheme("rose-pine")
+
 -- Native plugins
 cmd.filetype('plugin', 'indent', 'on')
 cmd.packadd('cfilter') -- Allows filtering the quickfix list with :cfdo
