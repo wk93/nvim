@@ -6,6 +6,7 @@ vim.g.did_load_snacks_plugin = true
 
 require("snacks").setup {
   bigfile = { enable = true, size = 2 * 1024 * 1024 },
+  indent = { enable = true },
   picker = {
     enable = true,
     db = { sqlite3_path = vim.fn.getenv("LIBSQLITE_CLIB_PATH") },
