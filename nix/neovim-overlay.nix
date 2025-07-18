@@ -34,7 +34,7 @@ with final.pkgs.lib; let
 
     snacks-nvim
 
-    nvim-treesitter-parsers.regex
+    nvim-treesitter.withAllGrammars
 
     # Useful utilities
     nvim-unception # Prevent nested neovim sessions | nvim-unception
