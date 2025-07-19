@@ -35,6 +35,7 @@ with final.pkgs.lib; let
     snacks-nvim
 
     nvim-treesitter.withAllGrammars
+    conform-nvim
 
     # Useful utilities
     nvim-unception # Prevent nested neovim sessions | nvim-unception

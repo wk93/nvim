@@ -46,6 +46,7 @@
           ripgrep
           lua-language-server
           nil
+          alejandra
           stylua
           luajitPackages.luacheck
           nvim-dev
