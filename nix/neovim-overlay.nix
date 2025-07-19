@@ -35,6 +35,7 @@ with final.pkgs.lib; let
     snacks-nvim
 
     nvim-treesitter.withAllGrammars
+    blink-cmp
     conform-nvim
 
     # Useful utilities
