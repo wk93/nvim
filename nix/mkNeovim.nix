@@ -159,20 +159,21 @@ with lib;
     extraMakeWrapperArgs = let
       sqliteLibExt = stdenv.hostPlatform.extensions.sharedLibrary;
       sqliteLibPath = "${sqlite.out}/lib/libsqlite3${sqliteLibExt}";
-    in builtins.concatStringsSep " " (
-      # Set the NVIM_APPNAME environment variable
-      (optional (appName != "nvim" && appName != null && appName != "")
-        ''--set NVIM_APPNAME "${appName}"'')
-      # Add external packages to the PATH
-      ++ (optional (externalPackages != [])
-        ''--prefix PATH : "${makeBinPath externalPackages}"'')
-      # Set the LIBSQLITE_CLIB_PATH if sqlite is enabled
-      ++ (optional withSqlite
-        ''--set LIBSQLITE_CLIB_PATH "${sqliteLibPath}"'')
-      # Set the LIBSQLITE environment variable if sqlite is enabled
-      ++ (optional withSqlite
-        ''--set LIBSQLITE "${sqliteLibPath}"'')
-    );
+    in
+      builtins.concatStringsSep " " (
+        # Set the NVIM_APPNAME environment variable
+        (optional (appName != "nvim" && appName != null && appName != "")
+          ''--set NVIM_APPNAME "${appName}"'')
+        # Add external packages to the PATH
+        ++ (optional (externalPackages != [])
+          ''--prefix PATH : "${makeBinPath externalPackages}"'')
+        # Set the LIBSQLITE_CLIB_PATH if sqlite is enabled
+        ++ (optional withSqlite
+          ''--set LIBSQLITE_CLIB_PATH "${sqliteLibPath}"'')
+        # Set the LIBSQLITE environment variable if sqlite is enabled
+        ++ (optional withSqlite
+          ''--set LIBSQLITE "${sqliteLibPath}"'')
+      );
 
     luaPackages = neovim-unwrapped.lua.pkgs;
     resolvedExtraLuaPackages = extraLuaPackages luaPackages;
@@ -211,8 +212,8 @@ with lib;
         + lib.optionalString isCustomAppName ''
           mv $out/bin/nvim $out/bin/${lib.escapeShellArg appName}
         '';
-      meta.mainProgram 
-        = if isCustomAppName 
-            then appName 
-            else oa.meta.mainProgram;
+      meta.mainProgram =
+        if isCustomAppName
+        then appName
+        else oa.meta.mainProgram;
     })

@@ -3,7 +3,7 @@ if vim.g.did_load_completion_plugin then
 end
 vim.g.did_load_completion_plugin = true
 
-local blink = require("blink.cmp")
+local blink = require('blink.cmp')
 
 blink.setup {
   cmdline = { enabled = true },
@@ -11,13 +11,10 @@ blink.setup {
     documentation = { auto_show = true },
     ghost_text = {
       enabled = true,
-
-
-
     },
     menu = {
-      auto_show = true
-    }
+      auto_show = true,
+    },
   },
   keymap = {
     ['<C-space>'] = { 'show', 'show_documentation', 'hide_documentation' },
@@ -36,5 +33,5 @@ blink.setup {
     ['<C-f>'] = { 'scroll_documentation_down', 'fallback' },
 
     ['<C-k>'] = { 'show_signature', 'hide_signature', 'fallback' },
-  }
+  },
 }
