@@ -8,6 +8,16 @@ conform.setup {
   formatters_by_ft = {
     lua = { 'stylua' },
     nix = { 'alejandra' },
+
+    javascript = { 'prettierd' },
+    javascriptreact = { 'prettierd' },
+    typescript = { 'prettierd' },
+    typescriptreact = { 'prettierd' },
+    json = { 'prettierd' },
+    yaml = { 'prettierd' },
+    html = { 'prettierd' },
+    css = { 'prettierd' },
+    markdown = { 'prettierd' },
   },
   default_format_opts = {
     lsp_format = 'fallback',

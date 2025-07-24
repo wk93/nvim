@@ -1,13 +1,10 @@
 # This overlay, when applied to nixpkgs, adds the final neovim derivation to nixpkgs.
-{ inputs }:
-final: prev:
-with final.pkgs.lib;
-let
+{inputs}: final: prev:
+with final.pkgs.lib; let
   pkgs = final;
 
   # Use this to create a plugin from a flake input
-  mkNvimPlugin =
-    src: pname:
+  mkNvimPlugin = src: pname:
     pkgs.vimUtils.buildVimPlugin {
       inherit pname src;
       version = src.lastModifiedDate;
@@ -57,16 +54,17 @@ let
     # language servers, etc.
     lua-language-server # lua LSP
     stylua # lua formatter
-    nil # nix LSP
 
+    nil # nix LSP
     alejandra # nix formatter
+
     vtsls # typescript LSP
+    prettierd # typescript formatter
 
     fd
     ripgrep
   ];
-in
-{
+in {
   # This is the neovim derivation
   # returned by the overlay
   nvim-pkg = mkNeovim {
