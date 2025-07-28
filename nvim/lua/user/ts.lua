@@ -1,9 +1,15 @@
-local M = {}
+local M = { launch = function() end }
+
+local vtsls_cmd = 'vtsls'
+
+if vim.fn.executable(vtsls_cmd) ~= 1 then
+  return M
+end
 
 function M.launch()
   vim.lsp.start {
     name = 'vtsls',
-    cmd = { 'vtsls', '--stdio' },
+    cmd = { vtsls_cmd, '--stdio' },
     filetypes = {
       'javascript',
       'javascriptreact',

@@ -61,6 +61,8 @@ with final.pkgs.lib; let
     vtsls # typescript LSP
     prettierd # typescript formatter
 
+    tailwindcss-language-server # tailwind lsp
+
     fd
     ripgrep
   ];
