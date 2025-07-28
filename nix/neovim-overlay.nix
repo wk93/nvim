@@ -35,7 +35,10 @@ with final.pkgs.lib; let
     snacks-nvim
 
     nvim-treesitter.withAllGrammars
-    blink-cmp
+
+    blink-cmp # autocompletions
+    nvim-highlight-colors # add colors to autocompletions
+
     conform-nvim
 
     # Useful utilities
