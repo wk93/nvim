@@ -41,6 +41,8 @@ with final.pkgs.lib; let
 
     conform-nvim
 
+    flutter-tools-nvim
+
     # Useful utilities
     nvim-unception # Prevent nested neovim sessions | nvim-unception
     # ^ Useful utilities

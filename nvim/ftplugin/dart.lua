@@ -14,3 +14,5 @@ vim.lsp.start {
   filetypes = { 'dart' },
   capabilities = require('user.lsp').make_client_capabilities(),
 }
+
+require('flutter-tools').setup {}
