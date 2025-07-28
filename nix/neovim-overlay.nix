@@ -66,6 +66,8 @@ with final.pkgs.lib; let
 
     tailwindcss-language-server # tailwind lsp
 
+    dart # dart lsp
+
     fd
     ripgrep
   ];
