@@ -72,6 +72,13 @@ with final.pkgs.lib; let
 
     fd
     ripgrep
+
+    # RUST
+    rustc
+    cargo
+    rust-analyzer
+    clippy
+    rustfmt
   ];
 in {
   # This is the neovim derivation
