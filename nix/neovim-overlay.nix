@@ -66,6 +66,8 @@ with final.pkgs.lib; let
     vtsls # typescript LSP
     prettierd # typescript formatter
 
+    svelte-language-server # svelte LSP
+
     tailwindcss-language-server # tailwind lsp
 
     dart # dart lsp
