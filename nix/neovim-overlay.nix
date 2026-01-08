@@ -60,6 +60,8 @@ with final.pkgs.lib; let
     lua-language-server # lua LSP
     stylua # lua formatter
 
+    vscode-langservers-extracted #eslint
+
     nil # nix LSP
     alejandra # nix formatter
 
