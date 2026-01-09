@@ -85,6 +85,23 @@ local function find_root(bufnr)
   return project_root
 end
 
+-- wspólna funkcja: eslint.applyAllFixes dla bufora
+local function eslint_fix_all(client, bufnr, timeout_ms)
+  if not client or client.is_stopped() then
+    return
+  end
+
+  client:request_sync('workspace/executeCommand', {
+    command = 'eslint.applyAllFixes',
+    arguments = {
+      {
+        uri = vim.uri_from_bufnr(bufnr),
+        version = lsp.util.buf_versions[bufnr],
+      },
+    },
+  }, timeout_ms or 1000, bufnr)
+end
+
 function M.launch()
   local bufnr = vim.api.nvim_get_current_buf()
   local root_dir = find_root(bufnr)
@@ -111,17 +128,23 @@ function M.launch()
     capabilities = require('user.lsp').make_client_capabilities(),
 
     on_attach = function(client, attached_bufnr)
+      -- ręczne wywołanie
       vim.api.nvim_buf_create_user_command(attached_bufnr, 'LspEslintFixAll', function()
-        client:request_sync('workspace/executeCommand', {
-          command = 'eslint.applyAllFixes',
-          arguments = {
-            {
-              uri = vim.uri_from_bufnr(attached_bufnr),
-              version = lsp.util.buf_versions[attached_bufnr],
-            },
-          },
-        }, nil, attached_bufnr)
+        eslint_fix_all(client, attached_bufnr, 2000)
       end, {})
+
+      -- FIX ON SAVE (BufWritePre)
+      local group = vim.api.nvim_create_augroup('EslintFixOnSave', { clear = false })
+      vim.api.nvim_clear_autocmds { group = group, buffer = attached_bufnr }
+
+      vim.api.nvim_create_autocmd('BufWritePre', {
+        group = group,
+        buffer = attached_bufnr,
+        desc = 'ESLint: apply all fixes on save',
+        callback = function()
+          eslint_fix_all(client, attached_bufnr, 2000)
+        end,
+      })
     end,
 
     settings = {
@@ -130,6 +153,7 @@ function M.launch()
       packageManager = nil,
       useESLintClass = false,
       experimental = { useFlatConfig = false },
+      -- zostawiamy off, bo i tak robimy to pewnie przez autocmd (BufWritePre)
       codeActionOnSave = { enable = false, mode = 'all' },
       format = true,
       quiet = false,
