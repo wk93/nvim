@@ -85,8 +85,8 @@ local function find_root(bufnr)
   return project_root
 end
 
--- wspólna funkcja: eslint.applyAllFixes dla bufora
-local function eslint_fix_all(client, bufnr, timeout_ms)
+-- sync (manual), może blokować UI
+local function eslint_fix_all_sync(client, bufnr, timeout_ms)
   if not client or client.is_stopped() then
     return
   end
@@ -100,6 +100,46 @@ local function eslint_fix_all(client, bufnr, timeout_ms)
       },
     },
   }, timeout_ms or 1000, bufnr)
+end
+
+-- async, nie blokuje zapisu (fix po zapisie + auto-write jeśli są zmiany)
+local function eslint_fix_all_async(client, bufnr)
+  if not client or client.is_stopped() then
+    return
+  end
+
+  if vim.b[bufnr].eslint_fix_inflight then
+    return
+  end
+  vim.b[bufnr].eslint_fix_inflight = true
+
+  client:request('workspace/executeCommand', {
+    command = 'eslint.applyAllFixes',
+    arguments = {
+      {
+        uri = vim.uri_from_bufnr(bufnr),
+        version = lsp.util.buf_versions[bufnr],
+      },
+    },
+  }, function()
+    -- applyEdit może przyjść chwilę później
+    vim.defer_fn(function()
+      vim.b[bufnr].eslint_fix_inflight = false
+
+      if not vim.api.nvim_buf_is_valid(bufnr) then
+        return
+      end
+
+      -- jeśli eslint coś poprawił, zapisujemy ponownie (bez pętli autocmd)
+      if vim.bo[bufnr].modified and not vim.b[bufnr].eslint_fix_suppress_write then
+        vim.b[bufnr].eslint_fix_suppress_write = true
+        vim.api.nvim_buf_call(bufnr, function()
+          vim.cmd('silent noautocmd write')
+        end)
+        vim.b[bufnr].eslint_fix_suppress_write = false
+      end
+    end, 50)
+  end, bufnr)
 end
 
 function M.launch()
@@ -131,21 +171,24 @@ function M.launch()
     capabilities = require('user.lsp').make_client_capabilities(),
 
     on_attach = function(client, attached_bufnr)
-      -- ręczne wywołanie
+      -- ręczne wywołanie (sync)
       vim.api.nvim_buf_create_user_command(attached_bufnr, 'LspEslintFixAll', function()
-        eslint_fix_all(client, attached_bufnr, 2000)
+        eslint_fix_all_sync(client, attached_bufnr, 2000)
       end, {})
 
-      -- FIX ON SAVE (BufWritePre)
+      -- FIX ON SAVE (BufWritePost) => bez freeza UI
       local group = vim.api.nvim_create_augroup('EslintFixOnSave', { clear = false })
       vim.api.nvim_clear_autocmds { group = group, buffer = attached_bufnr }
 
-      vim.api.nvim_create_autocmd('BufWritePre', {
+      vim.api.nvim_create_autocmd('BufWritePost', {
         group = group,
         buffer = attached_bufnr,
-        desc = 'ESLint: apply all fixes on save',
+        desc = 'ESLint: apply all fixes after save (async)',
         callback = function()
-          eslint_fix_all(client, attached_bufnr, 2000)
+          if vim.b[attached_bufnr].eslint_fix_suppress_write then
+            return
+          end
+          eslint_fix_all_async(client, attached_bufnr)
         end,
       })
     end,
@@ -156,16 +199,19 @@ function M.launch()
       packageManager = nil,
       useESLintClass = false,
       experimental = { useFlatConfig = false },
-      -- zostawiamy off, bo i tak robimy to pewnie przez autocmd (BufWritePre)
+
+      run = 'onSave',
+
       codeActionOnSave = { enable = false, mode = 'all' },
-      format = true,
+
+      format = false,
+
       quiet = false,
       onIgnoredFiles = 'off',
       rulesCustomizations = {},
-      run = 'onType',
       problems = { shortenToSingleLine = false },
       nodePath = '',
-      workingDirectory = { mode = 'auto' },
+      workingDirectory = { mode = 'location' },
       codeAction = {
         disableRuleComment = { enable = true, location = 'separateLine' },
         showDocumentation = { enable = true },
