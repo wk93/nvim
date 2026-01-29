@@ -125,6 +125,9 @@ function M.launch()
       'htmlangular',
     },
     root_dir = root_dir,
+    reuse_client = function(client, config)
+      return client.name == config.name and client.config.root_dir == config.root_dir
+    end,
     capabilities = require('user.lsp').make_client_capabilities(),
 
     on_attach = function(client, attached_bufnr)

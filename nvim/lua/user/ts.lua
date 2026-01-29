@@ -24,6 +24,9 @@ function M.launch()
       'package.json',
       '.git',
     }, { upward = true })[1]),
+    reuse_client = function(client, config)
+      return client.name == config.name and client.config.root_dir == config.root_dir
+    end,
     capabilities = require('user.lsp').make_client_capabilities(),
     settings = {
       typescript = {

@@ -25,6 +25,9 @@ function M.launch()
     cmd = { tailwind_cmd, '--stdio' },
     filetypes = { 'typescript', 'typescriptreact', 'javascript', 'javascriptreact', 'vue', 'astro', 'svelte' },
     root_dir = find_root(),
+    reuse_client = function(client, config)
+      return client.name == config.name and client.config.root_dir == config.root_dir
+    end,
     capabilities = require('user.lsp').make_client_capabilities(),
   }
 end
